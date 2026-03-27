@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   api:
     build:
@@ -25,7 +23,9 @@ services:
     volumes:
       - qdrant_data:/qdrant/storage
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:6333/healthz || exit 1"]
+      # qdrant image is minimal and does not include wget/curl.
+      # Check that REST port 6333 is listening (hex 18BD in /proc/net/tcp*).
+      test: ["CMD-SHELL", "grep -q ':18BD' /proc/net/tcp /proc/net/tcp6 || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
